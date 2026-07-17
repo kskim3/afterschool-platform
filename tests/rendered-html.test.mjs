@@ -16,7 +16,7 @@ test("renders the after-school operations app", async () => {
   const response = await render();
   assert.equal(response.status, 200);
   const html = await response.text();
-  assert.match(html, /<title>늘봄ON \| 방과후학교 통합운영<\/title>/i);
+  assert.match(html, /<title>늘봄ON \| 방과후학교 신청·정산 통합운영<\/title>/i);
   assert.match(html, /늘봄ON/);
   assert.match(html, /방과후학교/);
   assert.doesNotMatch(html, /codex-preview|SkeletonPreview|react-loading-skeleton/);

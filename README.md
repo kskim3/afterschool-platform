@@ -1,98 +1,49 @@
-# vinext-starter
+# 늘봄ON 방과후학교 통합운영
 
-A clean full-stack starter running on
-[vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
-Drizzle support.
+학부모의 수강신청 원장을 학교와 위탁업체가 함께 사용하고, 업체 자료의 인원·수강료·교재비·재료비·수용비·교육청 지원금을 자동 대조하는 운영 웹앱입니다.
 
-## Prerequisites
+## 구현 범위
 
-- Node.js `>=22.13.0`
+- 학부모 모바일 수강신청: 대상학년, 정원, 중복신청, 모집상태를 서버에서 검증
+- 관리자 강좌 원장: 비용 구성, 수업주수, 장소, 요일, 대상학년, 정원, 모집상태 관리
+- 학생·학부모 원장: 학생별 문자 URL 발송에 필요한 최소 정보와 지원한도 관리
+- 업체자료 검증: XLSX/CSV 업로드 후 학생명·강좌명 기준 자동 연결, 총액·지원금 차이 표시
+- 교육청 제출: 수강원장과 검증요약을 포함한 XLSX 자동 생성
+- 지원금·환불·문자 이력: 신청 시점의 비용 스냅샷과 처리상태 보존
+- Cloudflare D1 영속 저장과 중복 제출 방지용 idempotency key
 
-## Quick Start
+## 실행
 
 ```bash
 npm install
 npm run dev
-npm run build
 ```
 
-This starter does not use `wrangler.jsonc`.
+검증 명령:
 
-## Included Shape
-
-- edit site code under `app/`
-- `.openai/hosting.json` declares optional Sites D1 and R2 bindings
-- `vite.config.ts` simulates declared bindings for local development
-- `db/schema.ts` starts intentionally empty
-- `examples/d1/` contains an optional D1 example surface
-- `drizzle.config.ts` supports local migration generation when needed
-
-## Workspace Auth Headers
-
-OpenAI workspace sites can read the current user's email from
-`oai-authenticated-user-email`.
-
-SIWC-authenticated workspace sites may also receive
-`oai-authenticated-user-full-name` when the user's SIWC profile has a non-empty
-`name` claim. The full-name value is percent-encoded UTF-8 and is accompanied by
-`oai-authenticated-user-full-name-encoding: percent-encoded-utf-8`.
-
-Treat the full name as optional and fall back to email when it is absent:
-
-```tsx
-import { headers } from "next/headers";
-
-export default async function Home() {
-  const requestHeaders = await headers();
-  const email = requestHeaders.get("oai-authenticated-user-email");
-  const encodedFullName = requestHeaders.get("oai-authenticated-user-full-name");
-  const fullName =
-    encodedFullName &&
-    requestHeaders.get("oai-authenticated-user-full-name-encoding") ===
-      "percent-encoded-utf-8"
-      ? decodeURIComponent(encodedFullName)
-      : null;
-
-  const displayName = fullName ?? email;
-  // ...
-}
+```bash
+npm run lint
+npx tsc --noEmit
+npm test
 ```
 
-## Optional Dispatch-Owned ChatGPT Sign-In
+## 업체 엑셀 열 제목
 
-Import the ready-to-use helpers from `app/chatgpt-auth.ts` when the site needs
-optional or required ChatGPT sign-in:
+첫 번째 워크시트에서 다음 열을 자동 인식합니다.
 
-- Use `getChatGPTUser()` for optional signed-in UI.
-- Use `requireChatGPTUser(returnTo)` for server-rendered pages that should send
-  anonymous visitors through Sign in with ChatGPT.
-- Use `chatGPTSignInPath(returnTo)` and `chatGPTSignOutPath(returnTo)` for
-  browser links or actions.
-- Pass a same-origin relative `returnTo` path for the destination after sign-in
-  or sign-out. The helper validates and safely encodes it.
-- Mark protected pages with `export const dynamic = "force-dynamic"` because
-  they depend on per-request identity headers.
+- 학생명: `학생명`, `학생`, `성명`
+- 강좌명: `강좌명`, `강좌`, `프로그램명`, `프로그램`
+- 금액: `총액`, `수강료합계`, `청구액`, `업체총액`, `업체수강료`
+- 세부 금액만 있는 경우: `수강료`, `교재비`, `재료비`, `수용비` 또는 `운영비`
+- 지원금: `지원금`, `지원금액`, `자유수강권`, `교육청지원금`
 
-Dispatch owns `/signin-with-chatgpt`, `/signout-with-chatgpt`, `/callback`, the
-OAuth cookies, and identity header injection. Do not implement app routes for
-those reserved paths. Routes that do not import and call the helper remain
-anonymous-compatible.
+## 운영 전 연결할 외부 계약
 
-SIWC establishes identity only; it does not prove workspace membership. Use the
-Sites hosting platform's access policy controls for workspace-wide restrictions,
-or enforce explicit server-side membership or allowlist checks.
+현재 코드는 신청·검증·정산 원장을 실제로 저장하고 처리합니다. 다음 기능은 학교 또는 교육청의 계약정보를 환경변수로 연결한 뒤 활성화해야 합니다.
 
-Use SIWC for account pages, user-specific dashboards, saved records, and write
-actions tied to the current ChatGPT user. Leave public content anonymous.
+- 문자/알림톡 발송사 API와 학생별 URL 도메인
+- 실시간 계좌이체 PG 및 가상계좌 입금 웹훅
+- NEIS 또는 학교 학생명부 연계
+- 외부 학부모 인증과 학교 관리자 계정 체계
 
-## Useful Commands
-
-- `npm run dev`: start local development
-- `npm run build`: verify the vinext build output
-- `npm test`: build the starter and verify its rendered loading skeleton
-- `npm run db:generate`: generate Drizzle migrations after schema changes
-
-## Learn More
-
-- [vinext Documentation](https://github.com/cloudflare/vinext)
-- [Drizzle D1 Guide](https://orm.drizzle.team/docs/get-started/d1-new)
+실제 학생정보를 투입하기 전 개인정보 영향평가, 위수탁 계약, 접근권한, 보유기간, 다운로드 감사로그를 학교 정책에 맞게 확정해야 합니다.

@@ -19,6 +19,18 @@ npm install
 npm run dev
 ```
 
+### Railway 배포
+
+Railway의 Node.js 환경에서는 SQLite로 자동 실행됩니다. 재배포나 재시작 후에도 운영 데이터를 유지하려면 서비스에 Volume을 추가하고 `/data`에 마운트하세요. Railway가 제공하는 `RAILWAY_VOLUME_MOUNT_PATH`를 앱이 자동으로 인식합니다.
+
+별도 경로를 지정하려면 다음 환경변수를 사용할 수 있습니다.
+
+```bash
+SQLITE_PATH=/data/afterschool-platform.sqlite
+```
+
+Cloudflare Sites에서는 기존 D1 저장소를 그대로 사용합니다.
+
 검증 명령:
 
 ```bash

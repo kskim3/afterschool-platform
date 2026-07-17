@@ -1,3 +1,5 @@
+import { getOperationDatabase } from "../../../db/runtime";
+
 type VendorRow = {
   student?: string;
   course?: string;
@@ -20,9 +22,7 @@ type OperationPayload = {
 let initialization: Promise<void> | null = null;
 
 async function database() {
-  const { env } = await import("cloudflare:workers");
-  if (!env.DB) throw new Error("운영 데이터베이스 연결을 확인해 주세요.");
-  return env.DB;
+  return getOperationDatabase();
 }
 
 async function initializeDatabase() {

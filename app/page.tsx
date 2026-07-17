@@ -428,7 +428,7 @@ function SchoolSettings({ data }: { data: OperationsState }) {
     <>
       <PageIntro eyebrow="학교이름.xlsx 연계" title="학교 설정" description="서울 학교 기본정보의 행정표준코드와 관할 교육지원청을 운영 원장에 연결했습니다." />
       <section className="school-profile panel"><div className="school-monogram">서</div><div><p className="eyebrow">행정표준코드 {data.school.code}</p><h2>{data.school.name}</h2><p>{data.school.district} · {data.school.schoolType}</p></div><span className="status-badge success">학교정보 연결</span></section>
-      <div className="settings-grid"><article className="panel setting-card"><span>⌂</span><div><strong>주소</strong><p>{data.school.address}</p></div></article><article className="panel setting-card"><span>☎</span><div><strong>대표전화</strong><p>{data.school.phone}</p></div></article><article className="panel setting-card"><span>DB</span><div><strong>운영 원장</strong><p>Cloudflare D1 자동저장</p></div></article><article className="panel setting-card"><span>XLS</span><div><strong>교육청 제출</strong><p>XLSX 자동생성</p></div></article></div>
+      <div className="settings-grid"><article className="panel setting-card"><span>⌂</span><div><strong>주소</strong><p>{data.school.address}</p></div></article><article className="panel setting-card"><span>☎</span><div><strong>대표전화</strong><p>{data.school.phone}</p></div></article><article className="panel setting-card"><span>DB</span><div><strong>운영 원장</strong><p>서버 DB 자동저장</p></div></article><article className="panel setting-card"><span>XLS</span><div><strong>교육청 제출</strong><p>XLSX 자동생성</p></div></article></div>
     </>
   );
 }
